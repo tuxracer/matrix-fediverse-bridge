@@ -1,0 +1,21 @@
+{
+  "name": "matrix-activitypub-bridge",
+  "version": "0.0.1",
+  "description": "Bridge to enable communication between matrix.org users and ActivityPub users",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Derek Petersen",
+  "license": "MIT",
+  "dependencies": {
+    "matrix-bot-sdk": "^0.7.1"
+  },
+  "keywords": [
+    "matrix",
+    "activitypub",
+    "bridge",
+    "mastodon",
+    "fediverse"
+  ]
+}
