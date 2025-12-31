@@ -3,37 +3,37 @@
 ## Milestone 1: Project Foundation
 
 ### Project Setup
-- [ ] Initialize pnpm project with `pnpm init`
-- [ ] Install TypeScript and configure `tsconfig.json` with strict mode
-- [ ] Set up ESLint with TypeScript parser and recommended rules
-- [ ] Set up Prettier with consistent formatting rules
-- [ ] Configure Jest for TypeScript testing
-- [ ] Create `.gitignore` for Node.js/TypeScript projects
-- [ ] Set up `nodemon` or `ts-node-dev` for development hot reloading
+- [x] Initialize pnpm project with `pnpm init`
+- [x] Install TypeScript and configure `tsconfig.json` with strict mode
+- [x] Set up ESLint with TypeScript parser and recommended rules
+- [x] Set up Prettier with consistent formatting rules
+- [x] Configure Jest for TypeScript testing
+- [x] Create `.gitignore` for Node.js/TypeScript projects
+- [x] Set up `nodemon` or `ts-node-dev` for development hot reloading
 
 ### Directory Structure
-- [ ] Create `src/` directory structure as defined in TRD
-- [ ] Create `src/config/` directory
-- [ ] Create `src/matrix/` directory
-- [ ] Create `src/activitypub/` directory
-- [ ] Create `src/bridge/` directory
-- [ ] Create `src/db/` directory with `migrations/` and `repositories/` subdirectories
-- [ ] Create `src/queue/` directory with `workers/` subdirectory
-- [ ] Create `src/utils/` directory
-- [ ] Create `tests/unit/`, `tests/integration/`, and `tests/fixtures/` directories
-- [ ] Create `docker/` directory
+- [x] Create `src/` directory structure as defined in TRD
+- [x] Create `src/config/` directory
+- [x] Create `src/matrix/` directory
+- [x] Create `src/activitypub/` directory
+- [x] Create `src/bridge/` directory
+- [x] Create `src/db/` directory with `migrations/` and `repositories/` subdirectories
+- [x] Create `src/queue/` directory with `workers/` subdirectory
+- [x] Create `src/utils/` directory
+- [x] Create `tests/unit/`, `tests/integration/`, and `tests/fixtures/` directories
+- [x] Create `docker/` directory
 
 ### Dependencies
-- [ ] Install `matrix-appservice-bridge` and `matrix-bot-sdk`
-- [ ] Install `@fedify/fedify` for ActivityPub support
-- [ ] Install `express` and `@hono/node-server` for HTTP servers
-- [ ] Install `pg` for PostgreSQL connectivity
-- [ ] Install `ioredis` and `bullmq` for Redis and job queues
-- [ ] Install `sharp` for image processing
-- [ ] Install `winston` for logging
-- [ ] Install `zod` for schema validation
-- [ ] Install `http-signature` for HTTP signature support
-- [ ] Install development dependencies (TypeScript, Jest, ESLint, etc.)
+- [x] Install `matrix-appservice-bridge` and `matrix-bot-sdk`
+- [x] Install `@fedify/fedify` for ActivityPub support
+- [x] Install `express` and `@hono/node-server` for HTTP servers
+- [x] Install `pg` for PostgreSQL connectivity
+- [x] Install `ioredis` and `bullmq` for Redis and job queues
+- [x] Install `sharp` for image processing
+- [x] Install `winston` for logging
+- [x] Install `zod` for schema validation
+- [x] Install `http-signature` for HTTP signature support
+- [x] Install development dependencies (TypeScript, Jest, ESLint, etc.)
 
 ### Docker Development Environment
 - [ ] Create `docker/docker-compose.yml` with PostgreSQL service
