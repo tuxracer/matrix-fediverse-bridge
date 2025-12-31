@@ -12,6 +12,7 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U bridge -d matrix_ap_bridge']
       interval: 5s
@@ -40,8 +41,7 @@ services:
     image: matrixdotorg/synapse:latest
     container_name: bridge-synapse
     environment:
-      SYNAPSE_SERVER_NAME: localhost
-      SYNAPSE_REPORT_STATS: 'no'
+      SYNAPSE_CONFIG_PATH: /config/homeserver.yaml
     ports:
       - '8008:8008'
     volumes:
@@ -50,6 +50,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsSL http://localhost:8008/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     networks:
       - bridge-network
 
@@ -58,32 +64,67 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: bridge-app
+    env_file:
+      - ../.env
     environment:
-      NODE_ENV: development
+      # Override for Docker network
       DATABASE_URL: postgresql://bridge:bridge_dev_password@postgres:5432/matrix_ap_bridge
       REDIS_URL: redis://redis:6379
       MATRIX_HOMESERVER_URL: http://synapse:8008
-      MATRIX_DOMAIN: localhost
-      AP_DOMAIN: localhost:3000
-      AP_PORT: 3000
-      MATRIX_APPSERVICE_PORT: 9000
-      LOG_LEVEL: debug
     ports:
-      - '3000:3000'
+      - '8080:8080'
       - '9000:9000'
-    volumes:
-      - ../src:/app/src:ro
-      - ../package.json:/app/package.json:ro
-      - ../tsconfig.json:/app/tsconfig.json:ro
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      synapse:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     networks:
       - bridge-network
     profiles:
       - full
+
+  # Development mode: mount source for hot reloading
+  bridge-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: builder
+    container_name: bridge-app-dev
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://bridge:bridge_dev_password@postgres:5432/matrix_ap_bridge
+      REDIS_URL: redis://redis:6379
+      MATRIX_HOMESERVER_URL: http://synapse:8008
+    ports:
+      - '8080:8080'
+      - '9000:9000'
+    volumes:
+      - ../src:/app/src:ro
+      - ../package.json:/app/package.json:ro
+      - ../tsconfig.json:/app/tsconfig.json:ro
+    command: pnpm dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      synapse:
+        condition: service_healthy
+    networks:
+      - bridge-network
+    profiles:
+      - dev
 
 volumes:
   postgres_data:
