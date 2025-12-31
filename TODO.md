@@ -431,69 +431,69 @@
 ## Milestone 6: Social Features
 
 ### Follow/Unfollow
-- [ ] Create `src/db/repositories/follows.ts`
-- [ ] Implement `create()` for new follow
-- [ ] Implement `findByFollowerAndFollowing()`
-- [ ] Implement `updateStatus()` for accept/reject
-- [ ] Implement `delete()` for unfollow
-- [ ] Implement `findFollowers()` for actor
-- [ ] Implement `findFollowing()` for actor
+- [x] Create `src/db/repositories/follows.ts`
+- [x] Implement `create()` for new follow
+- [x] Implement `findByFollowerAndFollowing()`
+- [x] Implement `updateStatus()` for accept/reject
+- [x] Implement `delete()` for unfollow
+- [x] Implement `findFollowers()` for actor
+- [x] Implement `findFollowing()` for actor
 
 ### Follow Commands
-- [ ] Implement `!ap follow @user@instance` command
-- [ ] Parse AP handle from command
-- [ ] Resolve handle via WebFinger
-- [ ] Fetch remote actor
-- [ ] Create Follow activity
-- [ ] Sign and deliver to remote inbox
-- [ ] Store pending follow in database
+- [x] Implement `!ap follow @user@instance` command
+- [x] Parse AP handle from command
+- [x] Resolve handle via WebFinger
+- [x] Fetch remote actor
+- [x] Create Follow activity
+- [x] Sign and deliver to remote inbox
+- [x] Store pending follow in database
 
 ### Follow Activity Handling
-- [ ] Handle inbound `Follow` activity
-- [ ] Auto-accept follows (configurable)
-- [ ] Generate `Accept` activity
-- [ ] Deliver Accept to follower inbox
-- [ ] Update follow status in database
+- [x] Handle inbound `Follow` activity
+- [x] Auto-accept follows (configurable)
+- [x] Generate `Accept` activity
+- [x] Deliver Accept to follower inbox
+- [x] Update follow status in database
 
 ### Unfollow
-- [ ] Implement `!ap unfollow @user@instance` command
-- [ ] Create `Undo` activity wrapping original Follow
-- [ ] Deliver to remote inbox
-- [ ] Remove follow from database
+- [x] Implement `!ap unfollow @user@instance` command
+- [x] Create `Undo` activity wrapping original Follow
+- [x] Deliver to remote inbox
+- [x] Remove follow from database
 
 ### Reactions
-- [ ] Handle `m.reaction` Matrix events
-- [ ] Extract emoji from reaction
-- [ ] Look up AP object ID for reacted message
-- [ ] Create `Like` activity
-- [ ] Deliver to post author inbox
+- [x] Handle `m.reaction` Matrix events
+- [x] Extract emoji from reaction
+- [x] Look up AP object ID for reacted message
+- [x] Create `Like` activity
+- [x] Deliver to post author inbox
 
 ### Inbound Reactions
-- [ ] Handle inbound `Like` activity
-- [ ] Look up Matrix event ID for liked object
-- [ ] Create `m.reaction` event
-- [ ] Send via puppet or bot
+- [x] Handle inbound `Like` activity
+- [x] Look up Matrix event ID for liked object
+- [x] Create `m.reaction` event
+- [x] Send via puppet or bot
 
 ### Reaction Undo
-- [ ] Handle `m.redaction` of reactions
-- [ ] Create `Undo` activity for Like
-- [ ] Deliver undo to original recipient
-- [ ] Handle inbound `Undo` of `Like`
+- [x] Handle `m.redaction` of reactions
+- [x] Create `Undo` activity for Like
+- [x] Deliver undo to original recipient
+- [x] Handle inbound `Undo` of `Like`
 - [ ] Redact corresponding Matrix reaction
 
 ### Boosts/Announces
-- [ ] Handle inbound `Announce` activity
-- [ ] Fetch announced object if not cached
-- [ ] Create Matrix message representing boost
-- [ ] Include boost attribution
-- [ ] Implement `!ap boost` command
-- [ ] Create `Announce` activity
-- [ ] Deliver to followers
+- [x] Handle inbound `Announce` activity
+- [x] Fetch announced object if not cached
+- [x] Create Matrix message representing boost
+- [x] Include boost attribution
+- [x] Implement `!ap boost` command
+- [x] Create `Announce` activity
+- [x] Deliver to followers
 
 ### Boost Undo
 - [ ] Implement `!ap unboost` command
-- [ ] Create `Undo` activity for Announce
-- [ ] Handle inbound `Undo` of `Announce`
+- [x] Create `Undo` activity for Announce
+- [x] Handle inbound `Undo` of `Announce`
 
 ---
 

@@ -1,6 +1,7 @@
 import { type MatrixEvent } from './appservice.js';
 import { type MessageContent } from './events.js';
 import { matrixLogger } from '../utils/logger.js';
+import { getSocialService } from '../bridge/social.js';
 
 /**
  * Command context passed to handlers
@@ -97,6 +98,27 @@ export class CommandProcessor {
       description: 'Unfollow an ActivityPub user',
       usage: '!ap unfollow @user@instance.social',
       handler: async (ctx) => this.handleUnfollow(ctx),
+    });
+
+    this.registerCommand({
+      name: 'boost',
+      description: 'Boost/reblog a message (reply to the message you want to boost)',
+      usage: '!ap boost',
+      handler: async (ctx) => this.handleBoost(ctx),
+    });
+
+    this.registerCommand({
+      name: 'followers',
+      description: 'List your followers',
+      usage: '!ap followers',
+      handler: async (ctx) => this.handleFollowers(ctx),
+    });
+
+    this.registerCommand({
+      name: 'following',
+      description: 'List who you are following',
+      usage: '!ap following',
+      handler: async (ctx) => this.handleFollowing(ctx),
     });
 
     // Admin commands
@@ -276,7 +298,7 @@ export class CommandProcessor {
     return 'Double-puppeting logout is not yet implemented.';
   }
 
-  private handleFollow(ctx: CommandContext): string {
+  private async handleFollow(ctx: CommandContext): Promise<string> {
     const handle = ctx.args[0];
 
     if (handle === undefined) {
@@ -288,19 +310,67 @@ export class CommandProcessor {
       return `Invalid handle format. Use: @username@instance.social`;
     }
 
-    // TODO: Implement actual follow logic
-    return `Follow request for ${handle} is not yet implemented.`;
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const result = await socialService.follow(ctx.sender, handle);
+    return result.message;
   }
 
-  private handleUnfollow(ctx: CommandContext): string {
+  private async handleUnfollow(ctx: CommandContext): Promise<string> {
     const handle = ctx.args[0];
 
     if (handle === undefined) {
       return `Usage: \`${this.prefix} unfollow @user@instance.social\``;
     }
 
-    // TODO: Implement actual unfollow logic
-    return `Unfollow request for ${handle} is not yet implemented.`;
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const result = await socialService.unfollow(ctx.sender, handle);
+    return result.message;
+  }
+
+  private async handleBoost(ctx: CommandContext): Promise<string> {
+    // Check if this message is a reply to another message
+    const content = ctx.event.content as unknown as MessageContent;
+    const replyToEventId = content['m.relates_to']?.['m.in_reply_to']?.event_id;
+
+    if (replyToEventId === undefined) {
+      return 'To boost a message, reply to that message with `!ap boost`';
+    }
+
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const result = await socialService.sendBoost(ctx.sender, replyToEventId);
+    return result.message;
+  }
+
+  private async handleFollowers(_ctx: CommandContext): Promise<string> {
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    // TODO: Get user's follower list and format it
+    return 'Follower listing not yet implemented. Use the bridge\'s ActivityPub endpoints to view followers.';
+  }
+
+  private async handleFollowing(_ctx: CommandContext): Promise<string> {
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    // TODO: Get user's following list and format it
+    return 'Following listing not yet implemented. Use the bridge\'s ActivityPub endpoints to view following.';
   }
 
   private handleAdmin(ctx: CommandContext): string {
