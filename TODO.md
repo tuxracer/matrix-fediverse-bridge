@@ -274,96 +274,96 @@
 ## Milestone 4: Message Bridging
 
 ### Message Transformer
-- [ ] Create `src/bridge/transformer.ts`
-- [ ] Implement `matrixToAP()` main transformation function
-- [ ] Implement `apToMatrix()` main transformation function
+- [x] Create `src/bridge/transformer.ts`
+- [x] Implement `matrixToAP()` main transformation function
+- [x] Implement `apToMatrix()` main transformation function
 
 ### Matrix to ActivityPub Transformation
-- [ ] Convert plain text body to Note content
-- [ ] Convert formatted HTML body to Note content
-- [ ] Sanitize HTML (allowlist safe tags)
-- [ ] Transform Matrix mentions `@user:server` to `@user@server`
-- [ ] Transform room mentions to hashtags where applicable
-- [ ] Handle spoiler tags (`data-mx-spoiler`) to Content Warnings
-- [ ] Convert MXC URLs to proxy HTTPS URLs
-- [ ] Set `published` timestamp from event
-- [ ] Set `attributedTo` to actor URL
-- [ ] Determine audience (`to`, `cc`) based on room type
+- [x] Convert plain text body to Note content
+- [x] Convert formatted HTML body to Note content
+- [x] Sanitize HTML (allowlist safe tags)
+- [x] Transform Matrix mentions `@user:server` to `@user@server`
+- [x] Transform room mentions to hashtags where applicable
+- [x] Handle spoiler tags (`data-mx-spoiler`) to Content Warnings
+- [x] Convert MXC URLs to proxy HTTPS URLs
+- [x] Set `published` timestamp from event
+- [x] Set `attributedTo` to actor URL
+- [x] Determine audience (`to`, `cc`) based on room type
 - [ ] Handle custom emoji shortcodes
 
 ### ActivityPub to Matrix Transformation
-- [ ] Convert Note `content` HTML to Matrix HTML subset
-- [ ] Sanitize incoming HTML
-- [ ] Strip disallowed tags/attributes
-- [ ] Transform `@user@server` mentions to `@user:server`
-- [ ] Transform hashtags (preserve or convert)
-- [ ] Handle Content Warnings to spoiler format
-- [ ] Set `msgtype` appropriately
-- [ ] Set `format` to `org.matrix.custom.html` when HTML present
+- [x] Convert Note `content` HTML to Matrix HTML subset
+- [x] Sanitize incoming HTML
+- [x] Strip disallowed tags/attributes
+- [x] Transform `@user@server` mentions to `@user:server`
+- [x] Transform hashtags (preserve or convert)
+- [x] Handle Content Warnings to spoiler format
+- [x] Set `msgtype` appropriately
+- [x] Set `format` to `org.matrix.custom.html` when HTML present
 - [ ] Convert remote media URLs to MXC (via upload)
 
 ### Reply Threading
-- [ ] Extract reply-to from Matrix `m.relates_to.m.in_reply_to`
-- [ ] Look up AP object ID for Matrix event ID
-- [ ] Set `inReplyTo` field on AP Note
-- [ ] Extract `inReplyTo` from AP Note
-- [ ] Look up Matrix event ID for AP object ID
-- [ ] Set `m.relates_to.m.in_reply_to` on Matrix message
-- [ ] Handle missing reply targets gracefully
+- [x] Extract reply-to from Matrix `m.relates_to.m.in_reply_to`
+- [x] Look up AP object ID for Matrix event ID
+- [x] Set `inReplyTo` field on AP Note
+- [x] Extract `inReplyTo` from AP Note
+- [x] Look up Matrix event ID for AP object ID
+- [x] Set `m.relates_to.m.in_reply_to` on Matrix message
+- [x] Handle missing reply targets gracefully
 
 ### Message ID Mapping
-- [ ] Create `src/db/repositories/messages.ts`
-- [ ] Implement `create()` to store mapping
-- [ ] Implement `findByMatrixEventId()` lookup
-- [ ] Implement `findByAPObjectId()` lookup
-- [ ] Generate deterministic AP object IDs from Matrix events
-- [ ] Store bidirectional mappings on message bridge
+- [x] Create `src/db/repositories/messages.ts`
+- [x] Implement `create()` to store mapping
+- [x] Implement `findByMatrixEventId()` lookup
+- [x] Implement `findByAPObjectId()` lookup
+- [x] Generate deterministic AP object IDs from Matrix events
+- [x] Store bidirectional mappings on message bridge
 
 ### Room/Conversation Mapping
-- [ ] Create `src/db/repositories/rooms.ts`
-- [ ] Implement room type detection (DM, group, public)
-- [ ] Map Matrix room ID to AP context ID
-- [ ] Create room mapping on first bridged message
-- [ ] Implement `findByMatrixRoomId()` lookup
+- [x] Create `src/db/repositories/rooms.ts`
+- [x] Implement room type detection (DM, group, public)
+- [x] Map Matrix room ID to AP context ID
+- [x] Create room mapping on first bridged message
+- [x] Implement `findByMatrixRoomId()` lookup
 
 ### Message Router
-- [ ] Create `src/bridge/router.ts`
-- [ ] Detect if message should be bridged
-- [ ] Check if sender has AP followers
-- [ ] Determine target inboxes for AP delivery
-- [ ] Handle DM routing (direct to recipient inbox)
-- [ ] Handle public post routing (fan-out to followers)
+- [x] Create `src/bridge/router.ts`
+- [x] Detect if message should be bridged
+- [x] Check if sender has AP followers
+- [x] Determine target inboxes for AP delivery
+- [x] Handle DM routing (direct to recipient inbox)
+- [x] Handle public post routing (fan-out to followers)
 
 ### Message Queue
-- [ ] Create `src/queue/index.ts` BullMQ setup
-- [ ] Create Redis connection for queue
-- [ ] Define `matrix-to-ap` queue
-- [ ] Define `ap-to-matrix` queue
-- [ ] Define `ap-delivery` queue
-- [ ] Configure queue options (attempts, backoff)
+- [x] Create `src/queue/index.ts` BullMQ setup
+- [x] Create Redis connection for queue
+- [x] Define `matrix-to-ap` queue
+- [x] Define `ap-to-matrix` queue
+- [x] Define `ap-delivery` queue
+- [x] Configure queue options (attempts, backoff)
 
 ### Queue Workers
-- [ ] Create `src/queue/workers/matrixToAP.ts` worker
-- [ ] Process Matrix events, transform, enqueue delivery
-- [ ] Create `src/queue/workers/apToMatrix.ts` worker
-- [ ] Process AP activities, transform, send to Matrix
-- [ ] Create `src/queue/workers/apDelivery.ts` worker
-- [ ] Deliver activities to remote inboxes
+- [x] Create `src/queue/workers/matrixToAP.ts` worker
+- [x] Process Matrix events, transform, enqueue delivery
+- [x] Create `src/queue/workers/apToMatrix.ts` worker
+- [x] Process AP activities, transform, send to Matrix
+- [x] Create `src/queue/workers/apDelivery.ts` worker
+- [x] Deliver activities to remote inboxes
 
 ### Delivery System
-- [ ] Implement inbox delivery with HTTP signatures
-- [ ] Implement shared inbox optimization
-- [ ] Handle delivery failures (retry with backoff)
-- [ ] Implement exponential backoff (1s, 2s, 4s, 8s...)
-- [ ] Configure max retry attempts
-- [ ] Implement dead letter queue for permanent failures
-- [ ] Track delivery status per inbox
-- [ ] Log failed deliveries for debugging
+- [x] Implement inbox delivery with HTTP signatures
+- [x] Implement shared inbox optimization
+- [x] Handle delivery failures (retry with backoff)
+- [x] Implement exponential backoff (1s, 2s, 4s, 8s...)
+- [x] Configure max retry attempts
+- [x] Implement dead letter queue for permanent failures
+- [x] Track delivery status per inbox
+- [x] Log failed deliveries for debugging
 
 ### Fan-out Delivery
-- [ ] Fetch follower list for sender
-- [ ] Deduplicate by shared inbox
-- [ ] Create delivery jobs for each unique inbox
+- [x] Fetch follower list for sender
+- [x] Deduplicate by shared inbox
+- [x] Create delivery jobs for each unique inbox
 - [ ] Batch deliveries where possible
 
 ---
