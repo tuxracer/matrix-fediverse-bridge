@@ -603,18 +603,18 @@
 - [x] Add Redis-based distributed cache
 
 ### Documentation
-- [ ] Create `docs/deployment.md`
-- [ ] Document Docker deployment
-- [ ] Document systemd deployment
-- [ ] Document reverse proxy setup (nginx/Caddy)
-- [ ] Create `docs/configuration.md`
-- [ ] Document all environment variables
-- [ ] Document registration.yaml setup
-- [ ] Create `docs/user-guide.md`
-- [ ] Document available bot commands
-- [ ] Document how to login for double-puppeting
-- [ ] Document how to follow AP users
-- [ ] Update `README.md` with quick start
+- [x] Create `docs/deployment.md`
+- [x] Document Docker deployment
+- [x] Document systemd deployment
+- [x] Document reverse proxy setup (nginx/Caddy)
+- [x] Create `docs/configuration.md`
+- [x] Document all environment variables
+- [x] Document registration.yaml setup
+- [x] Create `docs/user-guide.md`
+- [x] Document available bot commands
+- [x] Document how to login for double-puppeting
+- [x] Document how to follow AP users
+- [x] Update `README.md` with quick start
 
 ### Unit Tests
 - [ ] Test configuration validation
