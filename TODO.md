@@ -85,21 +85,21 @@
 ## Milestone 2: Matrix Appservice Core
 
 ### Appservice HTTP Server
-- [ ] Create `src/matrix/appservice.ts` base server setup
-- [ ] Implement `PUT /_matrix/app/v1/transactions/:txnId` endpoint
-- [ ] Implement transaction deduplication logic
-- [ ] Implement `GET /_matrix/app/v1/users/:userId` query endpoint
-- [ ] Implement `GET /_matrix/app/v1/rooms/:roomAlias` query endpoint
-- [ ] Add request logging middleware
-- [ ] Add error handling middleware
+- [x] Create `src/matrix/appservice.ts` base server setup
+- [x] Implement `PUT /_matrix/app/v1/transactions/:txnId` endpoint
+- [x] Implement transaction deduplication logic
+- [x] Implement `GET /_matrix/app/v1/users/:userId` query endpoint
+- [x] Implement `GET /_matrix/app/v1/rooms/:roomAlias` query endpoint
+- [x] Add request logging middleware
+- [x] Add error handling middleware
 
 ### Appservice Registration
-- [ ] Create `registration.yaml` template
-- [ ] Generate secure `as_token` and `hs_token`
-- [ ] Configure user namespace regex `@_ap_.*:domain`
-- [ ] Configure room namespace regex `#_ap_.*:domain`
-- [ ] Configure alias namespace regex `#ap_.*:domain`
-- [ ] Document registration with homeserver
+- [x] Create `registration.yaml` template
+- [x] Generate secure `as_token` and `hs_token`
+- [x] Configure user namespace regex `@_ap_.*:domain`
+- [x] Configure room namespace regex `#_ap_.*:domain`
+- [x] Configure alias namespace regex `#ap_.*:domain`
+- [x] Document registration with homeserver
 
 ### matrix-appservice-bridge Integration
 - [ ] Initialize Bridge instance in appservice
@@ -110,13 +110,13 @@
 - [ ] Handle bridge reconnection logic
 
 ### Ghost User Management
-- [ ] Create `src/matrix/puppet.ts` for puppet management
-- [ ] Implement ghost user ID generation (`@_ap_user_instance:domain`)
-- [ ] Implement `createGhostUser()` function
-- [ ] Implement `getOrCreateGhostUser()` function
-- [ ] Implement profile sync for display name
-- [ ] Implement profile sync for avatar (MXC upload)
-- [ ] Add ghost user caching layer
+- [x] Create `src/matrix/puppet.ts` for puppet management
+- [x] Implement ghost user ID generation (`@_ap_user_instance:domain`)
+- [x] Implement `createGhostUser()` function
+- [x] Implement `getOrCreateGhostUser()` function
+- [x] Implement profile sync for display name
+- [x] Implement profile sync for avatar (MXC upload)
+- [x] Add ghost user caching layer
 
 ### User Repository
 - [ ] Create `src/db/repositories/users.ts`
@@ -128,24 +128,24 @@
 - [ ] Implement `getAccessToken()` with decryption
 
 ### Event Handlers
-- [ ] Create `src/matrix/events.ts` event handler module
-- [ ] Implement event type dispatcher
-- [ ] Implement `m.room.message` handler for text messages
-- [ ] Implement `m.room.message` handler for `m.image` msgtype
-- [ ] Implement `m.room.message` handler for `m.video` msgtype
-- [ ] Implement `m.room.message` handler for `m.audio` msgtype
-- [ ] Implement `m.room.message` handler for `m.file` msgtype
-- [ ] Implement `m.room.member` handler for joins
-- [ ] Implement `m.room.member` handler for leaves
-- [ ] Implement `m.room.member` handler for invites
-- [ ] Implement `m.reaction` handler
-- [ ] Implement `m.room.redaction` handler
-- [ ] Add event filtering for bridge-originated events (prevent loops)
+- [x] Create `src/matrix/events.ts` event handler module
+- [x] Implement event type dispatcher
+- [x] Implement `m.room.message` handler for text messages
+- [x] Implement `m.room.message` handler for `m.image` msgtype
+- [x] Implement `m.room.message` handler for `m.video` msgtype
+- [x] Implement `m.room.message` handler for `m.audio` msgtype
+- [x] Implement `m.room.message` handler for `m.file` msgtype
+- [x] Implement `m.room.member` handler for joins
+- [x] Implement `m.room.member` handler for leaves
+- [x] Implement `m.room.member` handler for invites
+- [x] Implement `m.reaction` handler
+- [x] Implement `m.room.redaction` handler
+- [x] Add event filtering for bridge-originated events (prevent loops)
 
 ### Double-Puppeting
 - [ ] Implement access token encryption utility in `src/utils/crypto.ts`
 - [ ] Implement access token decryption utility
-- [ ] Create `!ap login` command handler
+- [x] Create `!ap login` command handler
 - [ ] Implement `m.login.application_service` login flow
 - [ ] Store encrypted access tokens in database
 - [ ] Implement token validation on startup
@@ -153,13 +153,13 @@
 - [ ] Implement fallback to bot user when double-puppet unavailable
 
 ### Bot Commands
-- [ ] Create `src/matrix/commands.ts` command handler
-- [ ] Implement command parser for `!ap` prefix
-- [ ] Implement `!ap help` command
-- [ ] Implement `!ap login` command
-- [ ] Implement `!ap logout` command
-- [ ] Implement `!ap status` command
-- [ ] Implement `!ap whoami` command
+- [x] Create `src/matrix/commands.ts` command handler
+- [x] Implement command parser for `!ap` prefix
+- [x] Implement `!ap help` command
+- [x] Implement `!ap login` command
+- [x] Implement `!ap logout` command
+- [x] Implement `!ap status` command
+- [x] Implement `!ap whoami` command
 
 ---
 

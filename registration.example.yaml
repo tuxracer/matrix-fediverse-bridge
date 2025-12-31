@@ -1,0 +1,50 @@
+# Matrix Appservice Registration
+# Copy this file to registration.yaml and configure the tokens and domain
+
+# Unique ID for this appservice
+id: activitypub-bridge
+
+# URL where the homeserver can reach this appservice
+# Should match MATRIX_APPSERVICE_PORT in your .env
+url: http://localhost:9000
+
+# Token used by the appservice to authenticate with the homeserver
+# Generate with: openssl rand -hex 32
+as_token: <generate-with-openssl-rand-hex-32>
+
+# Token used by the homeserver to authenticate with the appservice
+# Generate with: openssl rand -hex 32
+hs_token: <generate-with-openssl-rand-hex-32>
+
+# Localpart of the bot user (will be @apbot:yourdomain.com)
+sender_localpart: apbot
+
+# Namespaces this appservice manages
+namespaces:
+  # Users with IDs matching these patterns are managed by this appservice
+  users:
+    - exclusive: true
+      # Ghost users for ActivityPub accounts: @_ap_username_instance:domain
+      regex: '@_ap_.*:yourdomain\.com'
+
+  # Rooms with IDs matching these patterns are managed by this appservice
+  rooms:
+    - exclusive: true
+      regex: '#_ap_.*:yourdomain\.com'
+
+  # Room aliases matching these patterns are managed by this appservice
+  aliases:
+    - exclusive: true
+      regex: '#ap_.*:yourdomain\.com'
+
+# Whether this appservice should be rate limited by the homeserver
+rate_limited: false
+
+# Protocol supported by this bridge (for Synapse integration)
+protocols:
+  - activitypub
+
+# Push ephemeral events (typing, presence) to this appservice
+# Set to true if you want to bridge these events
+de.sorunome.msc2409.push_ephemeral: false
+push_ephemeral: false
