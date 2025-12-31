@@ -1,5 +1,19 @@
 # Technical Requirements Document: Matrix-ActivityPub Double-Puppeting Bridge
 
+## Development Workflow
+
+When working on this project:
+
+1. **Refer to TODO.md for tasks**: Always check `TODO.md` for unchecked items (`- [ ]`) to identify work that needs to be done. Work through tasks in milestone order unless directed otherwise.
+
+2. **Mark tasks complete**: After completing a task, update `TODO.md` to mark the checkbox as done (`- [x]`).
+
+3. **Commit after completing work**: After completing an issue or a logical set of related issues, create a git commit with a descriptive message summarizing the changes. Group related small changes into a single commit when appropriate (e.g., creating multiple related files for a feature).
+
+4. **Keep commits atomic**: Each commit should represent a coherent unit of work that compiles and ideally passes tests. Avoid mixing unrelated changes in a single commit.
+
+---
+
 ## Overview
 
 This document specifies the technical requirements for implementing a bidirectional double-puppeting bridge between Matrix and ActivityPub (Fediverse) networks using TypeScript.
