@@ -289,7 +289,7 @@
 - [x] Set `published` timestamp from event
 - [x] Set `attributedTo` to actor URL
 - [x] Determine audience (`to`, `cc`) based on room type
-- [ ] Handle custom emoji shortcodes
+- [x] Handle custom emoji shortcodes
 
 ### ActivityPub to Matrix Transformation
 - [x] Convert Note `content` HTML to Matrix HTML subset
@@ -491,7 +491,7 @@
 - [x] Deliver to followers
 
 ### Boost Undo
-- [ ] Implement `!ap unboost` command
+- [x] Implement `!ap unboost` command
 - [x] Create `Undo` activity for Announce
 - [x] Handle inbound `Undo` of `Announce`
 
@@ -538,11 +538,11 @@
 - [ ] Create admin room detection/setup
 - [x] Implement `!ap admin stats` command
 - [x] Show user counts, message counts, federation stats
-- [ ] Implement `!ap admin sync-user <mxid>` command
-- [ ] Force profile sync for user
+- [x] Implement `!ap admin sync-user <mxid>` command
+- [x] Force profile sync for user
 - [x] Implement `!ap admin list-blocked` command
 - [x] Implement `!ap admin unblock-instance <domain>` command
-- [ ] Implement `!ap admin purge-user <handle>` command
+- [x] Implement `!ap admin purge-user <handle>` command
 
 ### Admin Permission Checks
 - [x] Define admin user list in config
@@ -657,7 +657,7 @@
 - [ ] Document security considerations
 
 ### Production Deployment
-- [ ] Create production Docker image
+- [x] Create production Docker image
 - [ ] Document backup procedures for database
 - [ ] Configure log aggregation
 - [ ] Set up alerting rules
