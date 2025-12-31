@@ -166,101 +166,101 @@
 ## Milestone 3: ActivityPub Server Core
 
 ### HTTP Server Setup
-- [ ] Create `src/activitypub/server.ts` with Express/Hono
-- [ ] Configure JSON-LD content type handling
-- [ ] Add `Accept` header parsing for content negotiation
-- [ ] Implement request logging
-- [ ] Add rate limiting middleware
-- [ ] Configure CORS if needed
+- [x] Create `src/activitypub/server.ts` with Express/Hono
+- [x] Configure JSON-LD content type handling
+- [x] Add `Accept` header parsing for content negotiation
+- [x] Implement request logging
+- [x] Add rate limiting middleware
+- [x] Configure CORS if needed
 
 ### WebFinger Endpoint
-- [ ] Create `src/activitypub/webfinger.ts`
-- [ ] Implement `GET /.well-known/webfinger` endpoint
-- [ ] Parse `resource` query parameter (acct: format)
-- [ ] Look up Matrix user by AP username
-- [ ] Generate JRD response with correct links
-- [ ] Add `self` link with `application/activity+json` type
-- [ ] Add profile page link
-- [ ] Handle user not found (404)
-- [ ] Add caching headers
+- [x] Create `src/activitypub/webfinger.ts`
+- [x] Implement `GET /.well-known/webfinger` endpoint
+- [x] Parse `resource` query parameter (acct: format)
+- [x] Look up Matrix user by AP username
+- [x] Generate JRD response with correct links
+- [x] Add `self` link with `application/activity+json` type
+- [x] Add profile page link
+- [x] Handle user not found (404)
+- [x] Add caching headers
 
 ### NodeInfo
-- [ ] Implement `GET /.well-known/nodeinfo` discovery endpoint
-- [ ] Create `/nodeinfo/2.1` endpoint
-- [ ] Include software name and version
-- [ ] Include protocol support (activitypub)
-- [ ] Include usage statistics (user count, post count)
-- [ ] Include open registrations status (false for bridge)
+- [x] Implement `GET /.well-known/nodeinfo` discovery endpoint
+- [x] Create `/nodeinfo/2.1` endpoint
+- [x] Include software name and version
+- [x] Include protocol support (activitypub)
+- [x] Include usage statistics (user count, post count)
+- [x] Include open registrations status (false for bridge)
 
 ### Host-Meta (Optional)
-- [ ] Implement `GET /.well-known/host-meta` endpoint
-- [ ] Return XML with WebFinger template
+- [x] Implement `GET /.well-known/host-meta` endpoint
+- [x] Return XML with WebFinger template
 
 ### Actor Management
-- [ ] Create `src/activitypub/actor.ts`
-- [ ] Implement `GET /users/:username` endpoint
-- [ ] Generate Actor JSON-LD structure
-- [ ] Include `id`, `type`, `preferredUsername`
-- [ ] Include `inbox`, `outbox`, `followers`, `following` URLs
-- [ ] Include `publicKey` object with PEM
-- [ ] Include `icon` for avatar
-- [ ] Include `name` for display name
-- [ ] Add content negotiation (JSON-LD vs HTML)
+- [x] Create `src/activitypub/actor.ts`
+- [x] Implement `GET /users/:username` endpoint
+- [x] Generate Actor JSON-LD structure
+- [x] Include `id`, `type`, `preferredUsername`
+- [x] Include `inbox`, `outbox`, `followers`, `following` URLs
+- [x] Include `publicKey` object with PEM
+- [x] Include `icon` for avatar
+- [x] Include `name` for display name
+- [x] Add content negotiation (JSON-LD vs HTML)
 
 ### Key Pair Management
-- [ ] Implement RSA key pair generation (4096-bit)
+- [x] Implement RSA key pair generation (4096-bit)
 - [ ] Store private key PEM in database
 - [ ] Store public key PEM in database
 - [ ] Implement key retrieval by actor
-- [ ] Create keys on actor first access
+- [x] Create keys on actor first access
 
 ### HTTP Signatures
-- [ ] Create `src/activitypub/signatures.ts`
-- [ ] Implement `signRequest()` function for outbound requests
-- [ ] Sign `(request-target)`, `host`, `date`, `digest` headers
-- [ ] Implement `verifySignature()` for inbound requests
-- [ ] Fetch remote actor public keys
-- [ ] Cache public keys with TTL
-- [ ] Handle key rotation (refetch on verification failure)
-- [ ] Implement `Digest` header generation
-- [ ] Implement `Digest` header verification
+- [x] Create `src/activitypub/signatures.ts`
+- [x] Implement `signRequest()` function for outbound requests
+- [x] Sign `(request-target)`, `host`, `date`, `digest` headers
+- [x] Implement `verifySignature()` for inbound requests
+- [x] Fetch remote actor public keys
+- [x] Cache public keys with TTL
+- [x] Handle key rotation (refetch on verification failure)
+- [x] Implement `Digest` header generation
+- [x] Implement `Digest` header verification
 
 ### Inbox Processing
-- [ ] Create `src/activitypub/inbox.ts`
-- [ ] Implement `POST /users/:username/inbox` endpoint
-- [ ] Implement `POST /inbox` shared inbox endpoint
-- [ ] Verify HTTP signature on all requests
-- [ ] Validate `Date` header (reject >30s drift)
-- [ ] Validate `Digest` header matches body
-- [ ] Parse and validate Activity JSON-LD
-- [ ] Route activities by type to handlers
-- [ ] Implement idempotency (deduplicate by activity ID)
+- [x] Create `src/activitypub/inbox.ts`
+- [x] Implement `POST /users/:username/inbox` endpoint
+- [x] Implement `POST /inbox` shared inbox endpoint
+- [x] Verify HTTP signature on all requests
+- [x] Validate `Date` header (reject >30s drift)
+- [x] Validate `Digest` header matches body
+- [x] Parse and validate Activity JSON-LD
+- [x] Route activities by type to handlers
+- [x] Implement idempotency (deduplicate by activity ID)
 
 ### Activity Handlers (Inbound)
-- [ ] Implement `Create` activity handler
-- [ ] Implement `Update` activity handler
-- [ ] Implement `Delete` activity handler
-- [ ] Implement `Like` activity handler
-- [ ] Implement `Announce` activity handler
-- [ ] Implement `Follow` activity handler
-- [ ] Implement `Accept` activity handler (follow acceptance)
-- [ ] Implement `Reject` activity handler
-- [ ] Implement `Undo` activity handler
-- [ ] Implement `Block` activity handler
-- [ ] Implement `Add` activity handler
-- [ ] Implement `Remove` activity handler
+- [x] Implement `Create` activity handler
+- [x] Implement `Update` activity handler
+- [x] Implement `Delete` activity handler
+- [x] Implement `Like` activity handler
+- [x] Implement `Announce` activity handler
+- [x] Implement `Follow` activity handler
+- [x] Implement `Accept` activity handler (follow acceptance)
+- [x] Implement `Reject` activity handler
+- [x] Implement `Undo` activity handler
+- [x] Implement `Block` activity handler
+- [x] Implement `Add` activity handler
+- [x] Implement `Remove` activity handler
 
 ### Outbox
 - [ ] Create `src/activitypub/outbox.ts`
-- [ ] Implement `GET /users/:username/outbox` endpoint
+- [x] Implement `GET /users/:username/outbox` endpoint
 - [ ] Return OrderedCollection with public activities
 - [ ] Implement pagination with `next`/`prev` links
 - [ ] Filter to only public activities
 
 ### Collections
-- [ ] Implement `GET /users/:username/followers` endpoint
-- [ ] Implement `GET /users/:username/following` endpoint
-- [ ] Return OrderedCollection format
+- [x] Implement `GET /users/:username/followers` endpoint
+- [x] Implement `GET /users/:username/following` endpoint
+- [x] Return OrderedCollection format
 - [ ] Implement pagination
 
 ### Object/Activity Lookup
