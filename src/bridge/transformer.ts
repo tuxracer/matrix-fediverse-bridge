@@ -1,6 +1,9 @@
 import { type MatrixEvent } from '../matrix/appservice.js';
 import { type MessageContent } from '../matrix/events.js';
 import { type APObject, type APAttachment, type APTag } from '../activitypub/inbox.js';
+import { type MediaProxy } from './media.js';
+import { getMediaHandlerRegistry, createMediaHandlerContext, type MatrixMediaContent } from './mediaTypes.js';
+import { getImageProcessor } from './imageProcessing.js';
 
 /**
  * ActivityPub Note object for bridged messages
@@ -28,6 +31,21 @@ export interface MatrixMessageContent {
   body: string;
   format?: string;
   formatted_body?: string;
+  url?: string;
+  info?: {
+    mimetype?: string;
+    size?: number;
+    w?: number;
+    h?: number;
+    duration?: number;
+    thumbnail_url?: string;
+    thumbnail_info?: {
+      mimetype?: string;
+      size?: number;
+      w?: number;
+      h?: number;
+    };
+  };
   'm.relates_to'?: {
     'm.in_reply_to'?: {
       event_id: string;
@@ -46,6 +64,9 @@ export interface TransformContext {
   convertMxcToHttps?: (mxcUrl: string) => string;
   convertHttpsToMxc?: (httpsUrl: string) => Promise<string>;
   getActorUrl?: (matrixUserId: string) => string;
+  mediaProxy?: MediaProxy;
+  generateBlurhash?: boolean;
+  generateThumbnails?: boolean;
 }
 
 /**
@@ -134,28 +155,62 @@ export async function matrixToAP(
   }
 
   // Handle media attachments
-  if (content.url !== undefined && context.convertMxcToHttps !== undefined) {
-    const httpsUrl = context.convertMxcToHttps(content.url);
-    const attachment: APAttachment = {
-      type: getAPMediaType(content.msgtype),
-      url: httpsUrl,
-      mediaType: content.info?.mimetype,
-    };
+  if (content.url !== undefined) {
+    if (context.mediaProxy !== undefined) {
+      // Use new media handler system
+      const registry = getMediaHandlerRegistry();
+      const handler = registry.getForMsgtype(content.msgtype);
+      const handlerContext = createMediaHandlerContext(context.mediaProxy, {
+        generateBlurhash: context.generateBlurhash ?? true,
+        generateThumbnails: context.generateThumbnails ?? true,
+      });
 
-    if (content.info?.w !== undefined) {
-      attachment.width = content.info.w;
-    }
-    if (content.info?.h !== undefined) {
-      attachment.height = content.info.h;
-    }
-    if (content.body !== undefined && content.body !== content.url) {
-      attachment.name = content.body; // Alt text
-    }
+      try {
+        const mediaContent: MatrixMediaContent = {
+          msgtype: content.msgtype as 'm.image' | 'm.video' | 'm.audio' | 'm.file',
+          body: content.body,
+          url: content.url,
+          info: content.info,
+        };
 
-    note.attachment = [attachment];
+        const apAttachment = await handler.matrixToAP(mediaContent, handlerContext);
+        note.attachment = [apAttachment];
+      } catch {
+        // Fallback to simple conversion
+        if (context.convertMxcToHttps !== undefined) {
+          note.attachment = [buildSimpleAttachment(content, context)];
+        }
+      }
+    } else if (context.convertMxcToHttps !== undefined) {
+      note.attachment = [buildSimpleAttachment(content, context)];
+    }
   }
 
   return note;
+}
+
+/**
+ * Build a simple AP attachment without advanced processing
+ */
+function buildSimpleAttachment(content: MessageContent, context: TransformContext): APAttachment {
+  const httpsUrl = context.convertMxcToHttps?.(content.url ?? '') ?? '';
+  const attachment: APAttachment = {
+    type: getAPMediaType(content.msgtype),
+    url: httpsUrl,
+    mediaType: content.info?.mimetype,
+  };
+
+  if (content.info?.w !== undefined) {
+    attachment.width = content.info.w;
+  }
+  if (content.info?.h !== undefined) {
+    attachment.height = content.info.h;
+  }
+  if (content.body !== undefined && content.body !== content.url) {
+    attachment.name = content.body;
+  }
+
+  return attachment;
 }
 
 /**
@@ -208,6 +263,67 @@ export async function apToMatrix(
   }
 
   return message;
+}
+
+/**
+ * Transform AP attachments to Matrix media messages
+ * Returns array of Matrix message contents for each attachment
+ */
+export async function apAttachmentsToMatrix(
+  attachments: APAttachment[],
+  context: TransformContext
+): Promise<MatrixMessageContent[]> {
+  const messages: MatrixMessageContent[] = [];
+
+  if (context.mediaProxy === undefined) {
+    // Without media proxy, just return text references
+    for (const attachment of attachments) {
+      messages.push({
+        msgtype: 'm.text',
+        body: attachment.name ?? attachment.url ?? 'Attachment',
+      });
+    }
+    return messages;
+  }
+
+  const registry = getMediaHandlerRegistry();
+  const handlerContext = createMediaHandlerContext(context.mediaProxy, {
+    generateBlurhash: context.generateBlurhash ?? true,
+    generateThumbnails: context.generateThumbnails ?? true,
+  });
+
+  for (const attachment of attachments) {
+    try {
+      const handler = registry.getForAPType(attachment.type);
+      const matrixContent = await handler.apToMatrix(
+        {
+          type: attachment.type as 'Image' | 'Video' | 'Audio' | 'Document',
+          mediaType: attachment.mediaType ?? 'application/octet-stream',
+          url: attachment.url ?? '',
+          name: attachment.name,
+          width: attachment.width,
+          height: attachment.height,
+          blurhash: attachment.blurhash,
+        },
+        handlerContext
+      );
+
+      messages.push({
+        msgtype: matrixContent.msgtype,
+        body: matrixContent.body,
+        url: matrixContent.url,
+        info: matrixContent.info as MatrixMessageContent['info'],
+      } as unknown as MatrixMessageContent);
+    } catch {
+      // Fallback: just send the URL as text
+      messages.push({
+        msgtype: 'm.text',
+        body: attachment.name ?? attachment.url ?? 'Attachment',
+      });
+    }
+  }
+
+  return messages;
 }
 
 /**

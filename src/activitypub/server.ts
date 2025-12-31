@@ -90,7 +90,7 @@ export class ActivityPubServer {
     });
 
     // Content negotiation middleware
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
+    this.app.use((_req: Request, res: Response, next: NextFunction) => {
       // Set default content type for ActivityPub responses
       res.setHeader('Content-Type', ACTIVITY_CONTENT_TYPE);
       next();

@@ -106,7 +106,7 @@ export class InboxProcessor {
   /**
    * Process an incoming activity
    */
-  async processActivity(activity: APActivity, requestBody: string): Promise<void> {
+  async processActivity(activity: APActivity, _requestBody: string): Promise<void> {
     const logger = activityPubLogger();
 
     // Get actor ID
@@ -265,7 +265,6 @@ export class InboxProcessor {
  */
 export function createInboxRouter(processor: InboxProcessor): Router {
   const router = express.Router();
-  const logger = activityPubLogger();
 
   /**
    * Middleware to capture raw body for signature verification

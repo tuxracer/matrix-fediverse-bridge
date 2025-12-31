@@ -1,5 +1,5 @@
 import { Worker, type Job } from 'bullmq';
-import type IORedis from 'ioredis';
+import { type Redis } from 'ioredis';
 import { type APDeliveryJobData, QUEUE_NAMES } from '../index.js';
 import { SignatureManager, generateDigest } from '../../activitypub/signatures.js';
 import { queueLogger } from '../../utils/logger.js';
@@ -36,7 +36,7 @@ const PERMANENT_FAILURE_CODES = [400, 401, 403, 404, 405, 410, 422];
  * Create the AP delivery worker
  */
 export function createAPDeliveryWorker(
-  connection: IORedis,
+  connection: Redis,
   context: APDeliveryWorkerContext
 ): Worker {
   const logger = queueLogger();
@@ -45,7 +45,7 @@ export function createAPDeliveryWorker(
   const worker = new Worker<APDeliveryJobData>(
     QUEUE_NAMES.AP_DELIVERY,
     async (job: Job<APDeliveryJobData>): Promise<DeliveryResult> => {
-      const { activityId, activity, inboxUrl, senderKeyId, retryCount = 0 } = job.data;
+      const { activityId, activity, inboxUrl, senderKeyId } = job.data;
 
       logger.info('Delivering activity', {
         jobId: job.id,

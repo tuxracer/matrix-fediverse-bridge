@@ -1,5 +1,5 @@
 import { Worker, type Job } from 'bullmq';
-import type IORedis from 'ioredis';
+import { type Redis } from 'ioredis';
 import { type MatrixToAPJobData, QUEUE_NAMES, getQueueManager } from '../index.js';
 import { matrixToAP, generateAPActivityId, type TransformContext } from '../../bridge/transformer.js';
 import { type MatrixEvent } from '../../matrix/appservice.js';
@@ -24,7 +24,7 @@ export interface MatrixToAPWorkerContext {
  * Create the Matrix to AP worker
  */
 export function createMatrixToAPWorker(
-  connection: IORedis,
+  connection: Redis,
   context: MatrixToAPWorkerContext
 ): Worker {
   const logger = queueLogger();
@@ -70,7 +70,7 @@ export function createMatrixToAPWorker(
         };
 
         // Transform to AP Note
-        const note = await matrixToAP(event, content as MessageContent, transformContext);
+        const note = await matrixToAP(event, content as unknown as MessageContent, transformContext);
 
         // Store message mapping
         await messagesRepo.upsertMessage({

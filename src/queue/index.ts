@@ -1,7 +1,10 @@
 import { Queue, type QueueOptions, type JobsOptions } from 'bullmq';
-import IORedis from 'ioredis';
+import IORedis, { type Redis as RedisInstance } from 'ioredis';
 import { type RedisConfig } from '../config/index.js';
 import { queueLogger } from '../utils/logger.js';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Redis = IORedis as any as new (url: string, options?: object) => RedisInstance;
 
 /**
  * Queue names
@@ -50,15 +53,15 @@ export interface APDeliveryJobData {
  * Queue manager for all bridge queues
  */
 export class QueueManager {
-  private connection: IORedis;
+  private connection: RedisInstance;
   private queues: Map<string, Queue> = new Map();
   private isShutdown = false;
 
   constructor(config: RedisConfig) {
-    this.connection = new IORedis(config.url, {
+    this.connection = new Redis(config.url, {
       maxRetriesPerRequest: config.maxRetriesPerRequest,
       enableReadyCheck: true,
-      retryStrategy: (times) => {
+      retryStrategy: (times: number) => {
         if (times > 10) {
           return null; // Stop retrying
         }
@@ -66,7 +69,7 @@ export class QueueManager {
       },
     });
 
-    this.connection.on('error', (error) => {
+    this.connection.on('error', (error: Error) => {
       queueLogger().error('Redis connection error', { error: error.message });
     });
 
@@ -298,7 +301,7 @@ export class QueueManager {
   /**
    * Get the Redis connection (for workers)
    */
-  getConnection(): IORedis {
+  getConnection(): RedisInstance {
     return this.connection;
   }
 }

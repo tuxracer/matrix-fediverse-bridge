@@ -122,6 +122,13 @@ export function queueLogger(): winston.Logger {
 }
 
 /**
+ * Log helper for bridge operations
+ */
+export function bridgeLogger(): winston.Logger {
+  return createChildLogger({ component: 'bridge' });
+}
+
+/**
  * Reset logger (primarily for testing)
  */
 export function resetLogger(): void {

@@ -371,60 +371,60 @@
 ## Milestone 5: Media Handling
 
 ### Media Proxy
-- [ ] Create `src/bridge/media.ts`
-- [ ] Implement `GET /media/:id` proxy endpoint
-- [ ] Serve cached media from local storage/S3
-- [ ] Implement on-demand fetch for uncached media
+- [x] Create `src/bridge/media.ts`
+- [x] Implement `GET /media/:id` proxy endpoint
+- [x] Serve cached media from local storage/S3
+- [x] Implement on-demand fetch for uncached media
 
 ### MXC to HTTPS Conversion
-- [ ] Parse MXC URLs (`mxc://server/mediaId`)
-- [ ] Generate proxy HTTPS URL
-- [ ] Create media database record
-- [ ] Return proxy URL for AP posts
+- [x] Parse MXC URLs (`mxc://server/mediaId`)
+- [x] Generate proxy HTTPS URL
+- [x] Create media database record
+- [x] Return proxy URL for AP posts
 
 ### HTTPS to MXC Conversion
-- [ ] Fetch remote media from AP URL
-- [ ] Validate content type matches claimed type
-- [ ] Upload to Matrix homeserver via media API
-- [ ] Store MXC URL in database
-- [ ] Return MXC URL for Matrix messages
+- [x] Fetch remote media from AP URL
+- [x] Validate content type matches claimed type
+- [x] Upload to Matrix homeserver via media API
+- [x] Store MXC URL in database
+- [x] Return MXC URL for Matrix messages
 
 ### Media Repository
-- [ ] Create `src/db/repositories/media.ts`
-- [ ] Implement `create()` method
-- [ ] Implement `findByMxcUrl()` method
-- [ ] Implement `findByAPUrl()` method
-- [ ] Implement `findById()` method
+- [x] Create `src/db/repositories/media.ts`
+- [x] Implement `create()` method
+- [x] Implement `findByMxcUrl()` method
+- [x] Implement `findByAPUrl()` method
+- [x] Implement `findById()` method
 
 ### Image Processing
-- [ ] Install and configure Sharp
-- [ ] Implement thumbnail generation
-- [ ] Configure thumbnail dimensions
-- [ ] Implement blurhash generation
-- [ ] Implement format detection
-- [ ] Implement WebP conversion (optional)
-- [ ] Implement image dimension extraction
+- [x] Install and configure Sharp
+- [x] Implement thumbnail generation
+- [x] Configure thumbnail dimensions
+- [x] Implement blurhash generation
+- [x] Implement format detection
+- [x] Implement WebP conversion (optional)
+- [x] Implement image dimension extraction
 
 ### Media Type Handlers
-- [ ] Implement image bridging (`m.image` <-> `Image`)
-- [ ] Extract/preserve image dimensions
-- [ ] Extract/preserve alt text
-- [ ] Implement video bridging (`m.video` <-> `Video`)
-- [ ] Implement audio bridging (`m.audio` <-> `Audio`)
-- [ ] Implement file bridging (`m.file` <-> `Document`)
+- [x] Implement image bridging (`m.image` <-> `Image`)
+- [x] Extract/preserve image dimensions
+- [x] Extract/preserve alt text
+- [x] Implement video bridging (`m.video` <-> `Video`)
+- [x] Implement audio bridging (`m.audio` <-> `Audio`)
+- [x] Implement file bridging (`m.file` <-> `Document`)
 
 ### Media Metadata
-- [ ] Preserve image dimensions across bridge
-- [ ] Preserve video/audio duration
-- [ ] Bridge alt text/description
-- [ ] Generate blurhash for images without one
-- [ ] Include blurhash in AP attachments
+- [x] Preserve image dimensions across bridge
+- [x] Preserve video/audio duration
+- [x] Bridge alt text/description
+- [x] Generate blurhash for images without one
+- [x] Include blurhash in AP attachments
 
 ### Media Caching
-- [ ] Implement LRU cache for frequently accessed media
-- [ ] Configure cache TTL
-- [ ] Implement cache eviction
-- [ ] Add cache headers to proxy responses
+- [x] Implement LRU cache for frequently accessed media
+- [x] Configure cache TTL
+- [x] Implement cache eviction
+- [x] Add cache headers to proxy responses
 
 ---
 

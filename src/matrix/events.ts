@@ -163,7 +163,7 @@ export class EventProcessor {
    * Handle m.room.message events
    */
   private async handleRoomMessage(event: MatrixEvent): Promise<void> {
-    const content = event.content as MessageContent;
+    const content = event.content as unknown as MessageContent;
     const msgtype = content.msgtype;
 
     const logger = matrixLogger();
@@ -214,7 +214,7 @@ export class EventProcessor {
    * Handle m.room.member events
    */
   private async handleRoomMember(event: MatrixEvent): Promise<void> {
-    const content = event.content as MemberContent;
+    const content = event.content as unknown as MemberContent;
     const membership = content.membership;
 
     const logger = matrixLogger();
@@ -252,7 +252,7 @@ export class EventProcessor {
    * Handle m.reaction events
    */
   private async handleReaction(event: MatrixEvent): Promise<void> {
-    const content = event.content as ReactionContent;
+    const content = event.content as unknown as ReactionContent;
 
     const logger = matrixLogger();
     logger.debug('Processing reaction', {

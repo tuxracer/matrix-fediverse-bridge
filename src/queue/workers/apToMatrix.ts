@@ -1,10 +1,9 @@
 import { Worker, type Job } from 'bullmq';
-import type IORedis from 'ioredis';
+import { type Redis } from 'ioredis';
 import { type APToMatrixJobData, QUEUE_NAMES } from '../index.js';
 import { apToMatrix, type TransformContext } from '../../bridge/transformer.js';
 import { type APObject } from '../../activitypub/inbox.js';
 import * as messagesRepo from '../../db/repositories/messages.js';
-import * as roomsRepo from '../../db/repositories/rooms.js';
 import { queueLogger } from '../../utils/logger.js';
 
 /**
@@ -27,7 +26,7 @@ export interface APToMatrixWorkerContext {
  * Create the AP to Matrix worker
  */
 export function createAPToMatrixWorker(
-  connection: IORedis,
+  connection: Redis,
   context: APToMatrixWorkerContext
 ): Worker {
   const logger = queueLogger();
@@ -35,7 +34,7 @@ export function createAPToMatrixWorker(
   const worker = new Worker<APToMatrixJobData>(
     QUEUE_NAMES.AP_TO_MATRIX,
     async (job: Job<APToMatrixJobData>) => {
-      const { activityId, activityType, actorId, object, targetRoomId } = job.data;
+      const { activityId, activityType } = job.data;
 
       logger.info('Processing AP to Matrix job', {
         jobId: job.id,
@@ -109,7 +108,7 @@ async function handleCreate(
   const { activityId, actorId, object, targetRoomId } = data;
 
   // Get the object (Note)
-  const note = object as APObject;
+  const note = object as unknown as APObject;
   if (note.type !== 'Note' && note.type !== 'Article') {
     return { handled: false, reason: 'Not a Note or Article' } as { handled: boolean };
   }
@@ -143,7 +142,7 @@ async function handleCreate(
   const matrixContent = await apToMatrix(note, transformContext);
 
   // Send message to Matrix
-  const eventId = await context.sendMessage(roomId, ghostUserId, matrixContent);
+  const eventId = await context.sendMessage(roomId, ghostUserId, matrixContent as unknown as Record<string, unknown>);
 
   // Store message mapping
   await messagesRepo.upsertMessage({
@@ -165,12 +164,12 @@ async function handleCreate(
  */
 async function handleUpdate(
   data: APToMatrixJobData,
-  context: APToMatrixWorkerContext
+  _context: APToMatrixWorkerContext
 ): Promise<{ handled: boolean }> {
   const logger = queueLogger();
   const { activityId, object } = data;
 
-  const note = object as APObject;
+  const note = object as unknown as APObject;
 
   // Find existing message mapping
   const existing = await messagesRepo.findByAPObjectId(note.id);
@@ -193,13 +192,13 @@ async function handleUpdate(
  */
 async function handleDelete(
   data: APToMatrixJobData,
-  context: APToMatrixWorkerContext
+  _context: APToMatrixWorkerContext
 ): Promise<{ handled: boolean }> {
   const logger = queueLogger();
   const { activityId, object } = data;
 
   // Object could be the ID string or an object
-  const objectId = typeof object === 'string' ? object : (object as APObject).id;
+  const objectId = typeof object === 'string' ? object : (object as unknown as APObject).id;
 
   // Find existing message mapping
   const existing = await messagesRepo.findByAPObjectId(objectId);
@@ -223,13 +222,13 @@ async function handleDelete(
  */
 async function handleLike(
   data: APToMatrixJobData,
-  context: APToMatrixWorkerContext
+  _context: APToMatrixWorkerContext
 ): Promise<{ handled: boolean }> {
   const logger = queueLogger();
-  const { activityId, actorId, object } = data;
+  const { activityId, object } = data;
 
   // Object is the liked post
-  const objectId = typeof object === 'string' ? object : (object as APObject).id;
+  const objectId = typeof object === 'string' ? object : (object as unknown as APObject).id;
 
   // Find the Matrix event
   const existing = await messagesRepo.findByAPObjectId(objectId);
@@ -250,13 +249,10 @@ async function handleLike(
  */
 async function handleAnnounce(
   data: APToMatrixJobData,
-  context: APToMatrixWorkerContext
+  _context: APToMatrixWorkerContext
 ): Promise<{ handled: boolean }> {
   const logger = queueLogger();
-  const { activityId, actorId, object } = data;
-
-  // Object is the boosted post
-  const objectId = typeof object === 'string' ? object : (object as APObject).id;
+  const { activityId } = data;
 
   // Would need to fetch the original post and share it
   logger.debug('Announce handling not yet fully implemented', { activityId });

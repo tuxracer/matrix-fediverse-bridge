@@ -58,8 +58,8 @@ const securityConfigSchema = z.object({
     .regex(/^[0-9a-fA-F]+$/, 'Must be a 64-character hex string'),
   blockedInstances: z
     .string()
-    .transform((val) => (val ? val.split(',').map((s) => s.trim()) : []))
-    .default(''),
+    .default('')
+    .transform((val) => (val ? val.split(',').map((s) => s.trim()) : [])),
   rateLimitPerMinute: z.coerce.number().int().min(1).default(100),
 });
 
@@ -136,8 +136,8 @@ export function loadConfig(): Config {
   const result = configSchema.safeParse(rawConfig);
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((err) => `  - ${String(err.path.join('.'))}: ${err.message}`)
       .join('\n');
     throw new Error(`Configuration validation failed:\n${errors}`);
   }
