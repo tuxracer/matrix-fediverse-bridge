@@ -562,30 +562,30 @@
 ## Milestone 8: Polish & Production Readiness
 
 ### Error Handling
-- [ ] Create custom error classes
+- [x] Create custom error classes
 - [ ] Implement global error handler
 - [ ] Add user-friendly error messages for common failures
 - [ ] Forward critical errors to admin room
 - [ ] Implement graceful degradation for non-critical failures
-- [ ] Add circuit breaker for failing remote instances
+- [x] Add circuit breaker for failing remote instances
 
 ### Monitoring - Prometheus Metrics
-- [ ] Install `prom-client`
-- [ ] Create `/metrics` endpoint
-- [ ] Add `bridge_messages_total` counter (direction, status)
-- [ ] Add `bridge_message_latency_seconds` histogram
-- [ ] Add `bridge_users_total` gauge
-- [ ] Add `bridge_rooms_total` gauge
-- [ ] Add `bridge_queue_depth` gauge per queue
-- [ ] Add `bridge_delivery_failures_total` counter
-- [ ] Add `bridge_http_requests_total` counter
+- [x] Install `prom-client`
+- [x] Create `/metrics` endpoint
+- [x] Add `bridge_messages_total` counter (direction, status)
+- [x] Add `bridge_message_latency_seconds` histogram
+- [x] Add `bridge_users_total` gauge
+- [x] Add `bridge_rooms_total` gauge
+- [x] Add `bridge_queue_depth` gauge per queue
+- [x] Add `bridge_delivery_failures_total` counter
+- [x] Add `bridge_http_requests_total` counter
 
 ### Health Checks
-- [ ] Implement `/health` endpoint
-- [ ] Check database connectivity
-- [ ] Check Redis connectivity
-- [ ] Check Matrix homeserver connectivity
-- [ ] Return degraded status for partial failures
+- [x] Implement `/health` endpoint
+- [x] Check database connectivity
+- [x] Check Redis connectivity
+- [x] Check Matrix homeserver connectivity
+- [x] Return degraded status for partial failures
 
 ### Performance Optimization
 - [ ] Profile database queries
@@ -596,11 +596,11 @@
 - [ ] Profile and optimize hot paths
 
 ### Caching Strategy
-- [ ] Cache actor data with TTL
-- [ ] Cache public keys with TTL
-- [ ] Cache WebFinger results with TTL
-- [ ] Implement cache invalidation
-- [ ] Add Redis-based distributed cache
+- [x] Cache actor data with TTL
+- [x] Cache public keys with TTL
+- [x] Cache WebFinger results with TTL
+- [x] Implement cache invalidation
+- [x] Add Redis-based distributed cache
 
 ### Documentation
 - [ ] Create `docs/deployment.md`
@@ -618,12 +618,12 @@
 
 ### Unit Tests
 - [ ] Test configuration validation
-- [ ] Test message transformation (Matrix to AP)
-- [ ] Test message transformation (AP to Matrix)
+- [x] Test message transformation (Matrix to AP)
+- [x] Test message transformation (AP to Matrix)
 - [ ] Test HTTP signature generation
 - [ ] Test HTTP signature verification
-- [ ] Test mention transformation
-- [ ] Test HTML sanitization
+- [x] Test mention transformation
+- [x] Test HTML sanitization
 - [ ] Test encryption/decryption utilities
 - [ ] Test repository methods
 
@@ -646,7 +646,7 @@
 - [ ] Test with Misskey (if possible)
 
 ### Security Audit
-- [ ] Run `pnpm audit` for dependency vulnerabilities
+- [x] Run `pnpm audit` for dependency vulnerabilities
 - [ ] Review input validation coverage
 - [ ] Review HTML sanitization rules
 - [ ] Verify HTTP signature implementation
