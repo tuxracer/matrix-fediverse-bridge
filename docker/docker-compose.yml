@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bridge-postgres
+    environment:
+      POSTGRES_USER: bridge
+      POSTGRES_PASSWORD: bridge_dev_password
+      POSTGRES_DB: matrix_ap_bridge
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bridge -d matrix_ap_bridge']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bridge-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: bridge-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bridge-network
+
+  synapse:
+    image: matrixdotorg/synapse:latest
+    container_name: bridge-synapse
+    environment:
+      SYNAPSE_SERVER_NAME: localhost
+      SYNAPSE_REPORT_STATS: 'no'
+    ports:
+      - '8008:8008'
+    volumes:
+      - synapse_data:/data
+      - ./synapse-config:/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bridge-network
+
+  bridge:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: bridge-app
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://bridge:bridge_dev_password@postgres:5432/matrix_ap_bridge
+      REDIS_URL: redis://redis:6379
+      MATRIX_HOMESERVER_URL: http://synapse:8008
+      MATRIX_DOMAIN: localhost
+      AP_DOMAIN: localhost:3000
+      AP_PORT: 3000
+      MATRIX_APPSERVICE_PORT: 9000
+      LOG_LEVEL: debug
+    ports:
+      - '3000:3000'
+      - '9000:9000'
+    volumes:
+      - ../src:/app/src:ro
+      - ../package.json:/app/package.json:ro
+      - ../tsconfig.json:/app/tsconfig.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - bridge-network
+    profiles:
+      - full
+
+volumes:
+  postgres_data:
+  redis_data:
+  synapse_data:
+
+networks:
+  bridge-network:
+    driver: bridge
