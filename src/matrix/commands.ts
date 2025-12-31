@@ -2,6 +2,7 @@ import { type MatrixEvent } from './appservice.js';
 import { type MessageContent } from './events.js';
 import { matrixLogger } from '../utils/logger.js';
 import { getSocialService } from '../bridge/social.js';
+import { getModerationService } from '../bridge/moderation.js';
 
 /**
  * Command context passed to handlers
@@ -119,6 +120,27 @@ export class CommandProcessor {
       description: 'List who you are following',
       usage: '!ap following',
       handler: async (ctx) => this.handleFollowing(ctx),
+    });
+
+    this.registerCommand({
+      name: 'block',
+      description: 'Block an ActivityPub user',
+      usage: '!ap block @user@instance.social [reason]',
+      handler: async (ctx) => this.handleBlock(ctx),
+    });
+
+    this.registerCommand({
+      name: 'unblock',
+      description: 'Unblock an ActivityPub user',
+      usage: '!ap unblock @user@instance.social',
+      handler: async (ctx) => this.handleUnblock(ctx),
+    });
+
+    this.registerCommand({
+      name: 'report',
+      description: 'Report an ActivityPub user',
+      usage: '!ap report @user@instance.social <reason>',
+      handler: async (ctx) => this.handleReport(ctx),
     });
 
     // Admin commands
@@ -373,27 +395,127 @@ export class CommandProcessor {
     return 'Following listing not yet implemented. Use the bridge\'s ActivityPub endpoints to view following.';
   }
 
-  private handleAdmin(ctx: CommandContext): string {
+  private async handleBlock(ctx: CommandContext): Promise<string> {
+    const handle = ctx.args[0];
+
+    if (handle === undefined) {
+      return `Usage: \`${this.prefix} block @user@instance.social [reason]\``;
+    }
+
+    // Validate AP handle format
+    if (!handle.match(/^@?[\w.-]+@[\w.-]+$/)) {
+      return 'Invalid handle format. Use: @username@instance.social';
+    }
+
+    const moderationService = getModerationService();
+    if (moderationService === null) {
+      return 'Moderation features are not initialized.';
+    }
+
+    // Resolve handle to actor ID
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const actor = await socialService.resolveHandle(handle);
+    if (actor === null) {
+      return `Could not resolve ${handle}`;
+    }
+
+    const reason = ctx.args.slice(1).join(' ') || undefined;
+    const result = await moderationService.blockUser(ctx.sender, actor.actorId, reason);
+    return result.message;
+  }
+
+  private async handleUnblock(ctx: CommandContext): Promise<string> {
+    const handle = ctx.args[0];
+
+    if (handle === undefined) {
+      return `Usage: \`${this.prefix} unblock @user@instance.social\``;
+    }
+
+    const moderationService = getModerationService();
+    if (moderationService === null) {
+      return 'Moderation features are not initialized.';
+    }
+
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const actor = await socialService.resolveHandle(handle);
+    if (actor === null) {
+      return `Could not resolve ${handle}`;
+    }
+
+    const result = await moderationService.unblockUser(ctx.sender, actor.actorId);
+    return result.message;
+  }
+
+  private async handleReport(ctx: CommandContext): Promise<string> {
+    const handle = ctx.args[0];
+    const reason = ctx.args.slice(1).join(' ');
+
+    if (handle === undefined || reason === '') {
+      return `Usage: \`${this.prefix} report @user@instance.social <reason>\``;
+    }
+
+    const moderationService = getModerationService();
+    if (moderationService === null) {
+      return 'Moderation features are not initialized.';
+    }
+
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const actor = await socialService.resolveHandle(handle);
+    if (actor === null) {
+      return `Could not resolve ${handle}`;
+    }
+
+    const result = await moderationService.sendReport(ctx.sender, actor.actorId, reason);
+    return result.message;
+  }
+
+  private async handleAdmin(ctx: CommandContext): Promise<string> {
     const subcommand = ctx.args[0]?.toLowerCase();
+    const moderationService = getModerationService();
 
     switch (subcommand) {
-      case 'stats':
-        // TODO: Implement actual stats
+      case 'stats': {
+        if (moderationService === null) {
+          return 'Moderation service not initialized.';
+        }
+
+        const stats = await moderationService.getStats();
         return [
           '**Bridge Statistics:**',
-          '- Users: 0',
-          '- Rooms: 0',
-          '- Messages bridged: 0',
-          '- Uptime: 0s',
+          `- Total Users: ${stats.users.total}`,
+          `  - Puppets (AP → Matrix): ${stats.users.puppets}`,
+          `  - Double Puppets: ${stats.users.doublePuppets}`,
+          `- Rooms: ${stats.rooms}`,
+          `- Messages bridged: ${stats.messages}`,
+          `- Blocked Instances: ${stats.blocks.instances}`,
         ].join('\n');
+      }
 
       case 'block-instance': {
         const instance = ctx.args[1];
         if (instance === undefined) {
-          return `Usage: \`${this.prefix} admin block-instance <domain>\``;
+          return `Usage: \`${this.prefix} admin block-instance <domain> [reason]\``;
         }
-        // TODO: Implement actual blocking
-        return `Instance blocking for ${instance} is not yet implemented.`;
+
+        if (moderationService === null) {
+          return 'Moderation service not initialized.';
+        }
+
+        const reason = ctx.args.slice(2).join(' ') || undefined;
+        const result = await moderationService.blockInstance(ctx.sender, instance, reason);
+        return result.message;
       }
 
       case 'unblock-instance': {
@@ -401,8 +523,29 @@ export class CommandProcessor {
         if (instance === undefined) {
           return `Usage: \`${this.prefix} admin unblock-instance <domain>\``;
         }
-        // TODO: Implement actual unblocking
-        return `Instance unblocking for ${instance} is not yet implemented.`;
+
+        if (moderationService === null) {
+          return 'Moderation service not initialized.';
+        }
+
+        const result = await moderationService.unblockInstance(ctx.sender, instance);
+        return result.message;
+      }
+
+      case 'list-blocked': {
+        if (moderationService === null) {
+          return 'Moderation service not initialized.';
+        }
+
+        const blockedInstances = await moderationService.getBlockedInstances();
+        if (blockedInstances.length === 0) {
+          return 'No instances are currently blocked.';
+        }
+
+        return [
+          '**Blocked Instances:**',
+          ...blockedInstances.map((instance) => `- ${instance}`),
+        ].join('\n');
       }
 
       case 'sync-user': {
@@ -420,6 +563,7 @@ export class CommandProcessor {
           `- \`${this.prefix} admin stats\` - Show bridge statistics`,
           `- \`${this.prefix} admin block-instance <domain>\` - Block an instance`,
           `- \`${this.prefix} admin unblock-instance <domain>\` - Unblock an instance`,
+          `- \`${this.prefix} admin list-blocked\` - List blocked instances`,
           `- \`${this.prefix} admin sync-user <mxid>\` - Force sync a user profile`,
         ].join('\n');
     }

@@ -500,54 +500,54 @@
 ## Milestone 7: Moderation & Admin
 
 ### Message Deletion (Matrix to AP)
-- [ ] Handle `m.room.redaction` events
-- [ ] Look up AP object ID for redacted event
-- [ ] Create `Delete` activity
-- [ ] Deliver to all original recipients
-- [ ] Remove local object cache
+- [x] Handle `m.room.redaction` events
+- [x] Look up AP object ID for redacted event
+- [x] Create `Delete` activity
+- [x] Deliver to all original recipients
+- [x] Remove local object cache
 
 ### Message Deletion (AP to Matrix)
-- [ ] Handle inbound `Delete` activity
-- [ ] Look up Matrix event ID for deleted object
-- [ ] Redact Matrix event via puppet or bot
-- [ ] Handle tombstone for deleted actors
+- [x] Handle inbound `Delete` activity
+- [x] Look up Matrix event ID for deleted object
+- [x] Redact Matrix event via puppet or bot
+- [x] Handle tombstone for deleted actors
 
 ### User Blocking
-- [ ] Implement `!ap block @user@instance` command
-- [ ] Create `Block` activity
-- [ ] Deliver to blocked user
-- [ ] Store block in database
-- [ ] Filter incoming activities from blocked users
-- [ ] Handle inbound `Block` activity
+- [x] Implement `!ap block @user@instance` command
+- [x] Create `Block` activity
+- [x] Deliver to blocked user
+- [x] Store block in database
+- [x] Filter incoming activities from blocked users
+- [x] Handle inbound `Block` activity
 
 ### Instance Blocking
-- [ ] Implement `!ap admin block-instance <domain>` command
-- [ ] Store blocked instances in database/config
-- [ ] Reject all activities from blocked instances
-- [ ] Skip delivery to blocked instances
-- [ ] Log blocked attempts
+- [x] Implement `!ap admin block-instance <domain>` command
+- [x] Store blocked instances in database/config
+- [x] Reject all activities from blocked instances
+- [x] Skip delivery to blocked instances
+- [x] Log blocked attempts
 
 ### Reporting
-- [ ] Handle inbound `Flag` activity
-- [ ] Forward report to admin Matrix room
-- [ ] Include report details (actor, object, content)
-- [ ] Implement `!ap report @user@instance [reason]` command
-- [ ] Create `Flag` activity for outbound reports
+- [x] Handle inbound `Flag` activity
+- [x] Forward report to admin Matrix room
+- [x] Include report details (actor, object, content)
+- [x] Implement `!ap report @user@instance [reason]` command
+- [x] Create `Flag` activity for outbound reports
 
 ### Admin Commands
 - [ ] Create admin room detection/setup
-- [ ] Implement `!ap admin stats` command
-- [ ] Show user counts, message counts, federation stats
+- [x] Implement `!ap admin stats` command
+- [x] Show user counts, message counts, federation stats
 - [ ] Implement `!ap admin sync-user <mxid>` command
 - [ ] Force profile sync for user
-- [ ] Implement `!ap admin list-blocked` command
-- [ ] Implement `!ap admin unblock-instance <domain>` command
+- [x] Implement `!ap admin list-blocked` command
+- [x] Implement `!ap admin unblock-instance <domain>` command
 - [ ] Implement `!ap admin purge-user <handle>` command
 
 ### Admin Permission Checks
-- [ ] Define admin user list in config
-- [ ] Verify admin permissions before admin commands
-- [ ] Log admin actions
+- [x] Define admin user list in config
+- [x] Verify admin permissions before admin commands
+- [x] Log admin actions
 
 ### Admin Dashboard (Optional)
 - [ ] Create basic web UI with Express
