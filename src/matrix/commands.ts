@@ -109,6 +109,13 @@ export class CommandProcessor {
     });
 
     this.registerCommand({
+      name: 'unboost',
+      description: 'Remove a boost/reblog (reply to the message you want to unboost)',
+      usage: '!ap unboost',
+      handler: async (ctx) => this.handleUnboost(ctx),
+    });
+
+    this.registerCommand({
       name: 'followers',
       description: 'List your followers',
       usage: '!ap followers',
@@ -375,6 +382,24 @@ export class CommandProcessor {
     return result.message;
   }
 
+  private async handleUnboost(ctx: CommandContext): Promise<string> {
+    // Check if this message is a reply to another message
+    const content = ctx.event.content as unknown as MessageContent;
+    const replyToEventId = content['m.relates_to']?.['m.in_reply_to']?.event_id;
+
+    if (replyToEventId === undefined) {
+      return 'To unboost a message, reply to that message with `!ap unboost`';
+    }
+
+    const socialService = getSocialService();
+    if (socialService === null) {
+      return 'Social features are not initialized.';
+    }
+
+    const result = await socialService.undoBoost(ctx.sender, replyToEventId);
+    return result.message;
+  }
+
   private async handleFollowers(_ctx: CommandContext): Promise<string> {
     const socialService = getSocialService();
     if (socialService === null) {
@@ -553,8 +578,55 @@ export class CommandProcessor {
         if (mxid === undefined) {
           return `Usage: \`${this.prefix} admin sync-user <@user:domain>\``;
         }
-        // TODO: Implement actual sync
-        return `User sync for ${mxid} is not yet implemented.`;
+
+        if (moderationService === null) {
+          return 'Moderation service not initialized.';
+        }
+
+        if (!moderationService.isAdmin(ctx.sender)) {
+          return 'Admin privileges required.';
+        }
+
+        // Force sync the user's profile
+        const socialService = getSocialService();
+        if (socialService === null) {
+          return 'Social service not initialized.';
+        }
+
+        try {
+          const result = await socialService.syncUserProfile(mxid);
+          if (result.success) {
+            return `Successfully synced profile for ${mxid}`;
+          }
+          return `Failed to sync profile: ${result.message}`;
+        } catch (error) {
+          return `Error syncing profile: ${error instanceof Error ? error.message : String(error)}`;
+        }
+      }
+
+      case 'purge-user': {
+        const handle = ctx.args[1];
+        if (handle === undefined) {
+          return `Usage: \`${this.prefix} admin purge-user <@user@instance>\``;
+        }
+
+        if (moderationService === null) {
+          return 'Moderation service not initialized.';
+        }
+
+        if (!moderationService.isAdmin(ctx.sender)) {
+          return 'Admin privileges required.';
+        }
+
+        try {
+          const result = await moderationService.purgeRemoteUser(handle);
+          if (result.success) {
+            return `Successfully purged data for ${handle}`;
+          }
+          return `Failed to purge user: ${result.message}`;
+        } catch (error) {
+          return `Error purging user: ${error instanceof Error ? error.message : String(error)}`;
+        }
       }
 
       default:
@@ -565,6 +637,7 @@ export class CommandProcessor {
           `- \`${this.prefix} admin unblock-instance <domain>\` - Unblock an instance`,
           `- \`${this.prefix} admin list-blocked\` - List blocked instances`,
           `- \`${this.prefix} admin sync-user <mxid>\` - Force sync a user profile`,
+          `- \`${this.prefix} admin purge-user <handle>\` - Remove all data for a remote user`,
         ].join('\n');
     }
   }

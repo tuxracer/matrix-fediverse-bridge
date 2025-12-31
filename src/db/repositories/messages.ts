@@ -253,3 +253,14 @@ export async function deleteOlderThan(days: number): Promise<number> {
   );
   return result.rowCount ?? 0;
 }
+
+/**
+ * Delete all messages from a sender
+ */
+export async function deleteBySenderId(senderId: string): Promise<number> {
+  const result = await query(
+    'DELETE FROM messages WHERE sender_id = $1',
+    [senderId]
+  );
+  return result.rowCount ?? 0;
+}

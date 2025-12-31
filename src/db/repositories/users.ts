@@ -354,3 +354,11 @@ export async function getUsersWithInboxes(
   );
   return result.rows;
 }
+
+/**
+ * Delete a user by ID
+ */
+export async function deleteById(userId: string): Promise<boolean> {
+  const result = await query('DELETE FROM users WHERE id = $1', [userId]);
+  return (result.rowCount ?? 0) > 0;
+}

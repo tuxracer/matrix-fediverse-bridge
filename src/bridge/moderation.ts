@@ -513,6 +513,63 @@ export class ModerationService {
     return roomsRepo.countAll();
   }
 
+  // ==================== User Purge ====================
+
+  /**
+   * Purge all data for a remote ActivityPub user
+   * This removes the user record and all associated data
+   */
+  async purgeRemoteUser(handle: string): Promise<{ success: boolean; message: string }> {
+    // Parse the handle (e.g., @user@instance or user@instance)
+    const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
+    const atIndex = cleanHandle.indexOf('@');
+
+    if (atIndex === -1) {
+      return { success: false, message: 'Invalid handle format. Use @user@instance' };
+    }
+
+    const username = cleanHandle.slice(0, atIndex);
+    const instance = cleanHandle.slice(atIndex + 1);
+
+    // Construct the likely actor ID
+    const actorId = `https://${instance}/users/${username}`;
+
+    // Look up the user
+    const user = await usersRepo.findByAPActorId(actorId);
+    if (user === null) {
+      return { success: false, message: `User ${handle} not found in bridge database` };
+    }
+
+    // Delete related data
+    try {
+      // Delete messages from this user
+      await messagesRepo.deleteBySenderId(user.id);
+
+      // Delete blocks involving this user
+      await blocksRepo.deleteBlocksForUser(user.id);
+
+      // Delete follows involving this user
+      const followsRepo = await import('../db/repositories/follows.js');
+      await followsRepo.deleteFollowsForUser(user.id);
+
+      // Delete the user record
+      await usersRepo.deleteById(user.id);
+
+      this.logger.info('Purged remote user', {
+        handle,
+        userId: user.id,
+      });
+
+      return { success: true, message: `Purged all data for ${handle}` };
+    } catch (error) {
+      this.logger.error('Failed to purge remote user', {
+        handle,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return { success: false, message: 'Failed to purge user data' };
+    }
+  }
+
   // ==================== Utility Methods ====================
 
   /**

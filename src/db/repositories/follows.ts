@@ -291,3 +291,14 @@ export async function getAcceptedFollowerIds(userId: string): Promise<string[]> 
   );
   return result.rows.map((row) => row.follower_id);
 }
+
+/**
+ * Delete all follows involving a user (as follower or following)
+ */
+export async function deleteFollowsForUser(userId: string): Promise<number> {
+  const result = await query(
+    'DELETE FROM follows WHERE follower_id = $1 OR following_id = $1',
+    [userId]
+  );
+  return result.rowCount ?? 0;
+}

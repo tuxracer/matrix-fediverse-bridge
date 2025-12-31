@@ -120,18 +120,26 @@ export async function matrixToAP(
   if (content.msgtype === 'm.text' || content.msgtype === 'm.notice') {
     // Convert content
     if (content.formatted_body !== undefined && content.format === 'org.matrix.custom.html') {
-      note.content = transformMatrixHtmlToAP(content.formatted_body, context);
+      // Extract custom emoji from HTML before other transformations
+      const { content: emojiProcessedContent, emojiTags } = extractCustomEmoji(content.formatted_body, context);
+      note.content = transformMatrixHtmlToAP(emojiProcessedContent, context);
       note.source = {
         content: content.body,
         mediaType: 'text/plain',
       };
+
+      // Add emoji tags if any were found
+      if (emojiTags.length > 0) {
+        note.tag = [...(note.tag ?? []), ...(emojiTags as unknown as APTag[])];
+      }
     } else {
       note.content = escapeHtml(content.body);
     }
 
     // Transform mentions
     note.content = transformMatrixMentionsToAP(note.content, context.domain);
-    note.tag = extractMentionTags(content.body, context);
+    const mentionTags = extractMentionTags(content.body, context);
+    note.tag = [...(note.tag ?? []), ...mentionTags];
   } else if (content.msgtype === 'm.emote') {
     // Emotes are prefixed with the sender's name
     const displayName = event.sender.split(':')[0]?.slice(1) ?? 'Someone';
@@ -231,12 +239,17 @@ export async function apToMatrix(
     const plainText = stripHtml(note.content);
 
     // Transform AP mentions to Matrix mentions
-    const transformedHtml = transformAPMentionsToMatrix(sanitizedHtml, context.domain);
-    const transformedPlain = transformAPMentionsToMatrix(plainText, context.domain);
+    let transformedHtml = transformAPMentionsToMatrix(sanitizedHtml, context.domain);
+    let transformedPlain = transformAPMentionsToMatrix(plainText, context.domain);
+
+    // Transform custom emoji from AP to Matrix format
+    const emojiResult = transformAPEmojiToMatrix(transformedHtml, note.tag, context);
+    transformedHtml = emojiResult.html;
+    transformedPlain = transformAPEmojiToMatrix(transformedPlain, note.tag, context).text;
 
     message.body = transformedPlain;
 
-    if (sanitizedHtml !== plainText) {
+    if (transformedHtml !== transformedPlain) {
       message.format = 'org.matrix.custom.html';
       message.formatted_body = transformedHtml;
     }
@@ -460,6 +473,103 @@ function extractMentionTags(body: string, context: TransformContext): APTag[] {
   }
 
   return tags;
+}
+
+/**
+ * Custom emoji representation in ActivityPub
+ */
+export interface APEmoji {
+  type: 'Emoji';
+  id: string;
+  name: string;
+  icon: {
+    type: 'Image';
+    mediaType: string;
+    url: string;
+  };
+}
+
+/**
+ * Extract custom emoji shortcodes from Matrix content
+ * Matrix custom emoji are in the format :shortcode: with an associated image
+ */
+function extractCustomEmoji(
+  html: string,
+  context: TransformContext
+): { content: string; emojiTags: APEmoji[] } {
+  const emojiTags: APEmoji[] = [];
+
+  // Match Matrix custom emoji images: <img data-mx-emoticon src="mxc://..." alt=":shortcode:" ...>
+  const emojiRegex = /<img[^>]*data-mx-emoticon[^>]*src="(mxc:\/\/[^"]+)"[^>]*alt=":([^:]+):"[^>]*>/gi;
+
+  const content = html.replace(emojiRegex, (match, mxcUrl: string, shortcode: string) => {
+    // Convert MXC URL to HTTPS if converter available
+    const httpsUrl = context.convertMxcToHttps?.(mxcUrl) ?? mxcUrl;
+
+    // Add emoji tag
+    emojiTags.push({
+      type: 'Emoji',
+      id: `${context.baseUrl}/emoji/${encodeURIComponent(shortcode)}`,
+      name: `:${shortcode}:`,
+      icon: {
+        type: 'Image',
+        mediaType: 'image/png', // Default, could be detected
+        url: httpsUrl,
+      },
+    });
+
+    // Replace image with shortcode text for AP (will be rendered by the receiving server)
+    return `:${shortcode}:`;
+  });
+
+  return { content, emojiTags };
+}
+
+/**
+ * Transform ActivityPub custom emoji to Matrix format
+ * AP emoji are represented as Emoji tags with icon URLs
+ */
+function transformAPEmojiToMatrix(
+  content: string,
+  tags: APTag[] | undefined,
+  context: TransformContext
+): { text: string; html: string } {
+  if (tags === undefined || tags.length === 0) {
+    return { text: content, html: content };
+  }
+
+  // Filter emoji tags
+  const emojiTags = tags.filter((tag): tag is APTag & { icon: { url: string } } =>
+    tag.type === 'Emoji' && tag.name !== undefined && 'icon' in tag
+  );
+
+  if (emojiTags.length === 0) {
+    return { text: content, html: content };
+  }
+
+  let html = content;
+  let text = content;
+
+  for (const emoji of emojiTags) {
+    const shortcode = emoji.name; // e.g., ":blobcat:"
+    const iconUrl = (emoji as unknown as { icon: { url: string } }).icon.url;
+
+    // In HTML, replace shortcode with image
+    const imgTag = `<img data-mx-emoticon height="32" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(shortcode)}" title="${escapeHtml(shortcode)}">`;
+    html = html.replace(new RegExp(escapeRegExp(shortcode), 'g'), imgTag);
+
+    // Keep shortcode in plain text
+    // (text remains unchanged for this emoji)
+  }
+
+  return { text, html };
+}
+
+/**
+ * Escape special regex characters
+ */
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**

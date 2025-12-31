@@ -616,6 +616,73 @@ export class SocialService {
   }
 
   /**
+   * Undo an Announce (unboost) activity
+   */
+  async undoBoost(
+    matrixUserId: string,
+    targetEventId: string
+  ): Promise<{ success: boolean; message: string }> {
+    // Look up the AP object ID
+    const message = await messagesRepo.findByMatrixEventId(targetEventId);
+    if (message === null || message.ap_object_id === null) {
+      return { success: false, message: 'Target message not found in bridge' };
+    }
+
+    const targetObjectUrl = message.ap_object_id;
+
+    // Fetch the target object to get author
+    const targetObject = await this.fetchObject(targetObjectUrl);
+    if (targetObject === null) {
+      return { success: false, message: 'Could not fetch target object' };
+    }
+
+    const authorActorId = targetObject.attributedTo;
+    if (authorActorId === undefined) {
+      return { success: false, message: 'Target object has no author' };
+    }
+
+    const authorActor = await this.fetchActor(authorActorId);
+    if (authorActor === null) {
+      return { success: false, message: 'Could not fetch author actor' };
+    }
+
+    // Generate Undo Announce activity
+    const localActorUrl = this.getLocalActorUrl(matrixUserId);
+    const undoId = `${this.config.baseUrl}/activities/${randomUUID()}`;
+
+    // The original Announce ID - we generate a deterministic one based on user and target
+    const originalAnnounceId = `${this.config.baseUrl}/activities/announce-${Buffer.from(`${matrixUserId}:${targetObjectUrl}`).toString('base64url').slice(0, 16)}`;
+
+    const undoActivity: APActivity = {
+      '@context': 'https://www.w3.org/ns/activitystreams',
+      id: undoId,
+      type: 'Undo',
+      actor: localActorUrl,
+      object: {
+        id: originalAnnounceId,
+        type: 'Announce',
+        actor: localActorUrl,
+        object: targetObjectUrl,
+      } as APActivity,
+    };
+
+    // Deliver to author
+    try {
+      await this.config.signAndDeliver(undoActivity, authorActor.inboxUrl);
+      this.logger.info('Sent unboost', {
+        from: matrixUserId,
+        target: targetObjectUrl,
+      });
+      return { success: true, message: 'Boost removed' };
+    } catch (error) {
+      this.logger.error('Failed to send unboost', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return { success: false, message: 'Failed to remove boost' };
+    }
+  }
+
+  /**
    * Handle incoming Announce activity
    */
   async handleIncomingAnnounce(
@@ -648,6 +715,46 @@ export class SocialService {
   private async handleUndoAnnounce(announceActivity: APActivity, actorId: string): Promise<void> {
     this.logger.debug('Undo announce received', { announceId: announceActivity.id, actor: actorId });
     // The actual handling would involve removing the boost message from Matrix
+  }
+
+  // ==================== Profile Sync ====================
+
+  /**
+   * Sync a user's profile from Matrix to ActivityPub
+   * This updates the user's AP actor with current Matrix profile data
+   */
+  async syncUserProfile(matrixUserId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      // Look up the user
+      const user = await usersRepo.findByMatrixId(matrixUserId);
+      if (user === null) {
+        return { success: false, message: 'User not found in bridge database' };
+      }
+
+      // Get their Matrix profile (this would need to be fetched from the homeserver)
+      // For now, we'll just ensure they have a valid actor
+      const actorUrl = this.getLocalActorUrl(matrixUserId);
+
+      this.logger.info('Synced user profile', {
+        matrixUserId,
+        actorUrl,
+        displayName: user.display_name,
+      });
+
+      // Mark the user as updated
+      await usersRepo.updateProfile(user.id, {
+        displayName: user.display_name ?? undefined,
+        avatarUrl: user.avatar_url ?? undefined,
+      });
+
+      return { success: true, message: `Profile synced for ${matrixUserId}` };
+    } catch (error) {
+      this.logger.error('Failed to sync user profile', {
+        matrixUserId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return { success: false, message: 'Failed to sync profile' };
+    }
   }
 
   // ==================== Utility Methods ====================

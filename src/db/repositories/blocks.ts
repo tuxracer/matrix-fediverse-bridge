@@ -280,3 +280,14 @@ export async function getBlockedInstanceDomains(): Promise<string[]> {
   );
   return result.rows.map((row) => row.blocked_instance);
 }
+
+/**
+ * Delete all blocks involving a user (as blocker or blocked)
+ */
+export async function deleteBlocksForUser(userId: string): Promise<number> {
+  const result = await query(
+    'DELETE FROM blocks WHERE blocker_id = $1 OR blocked_user_id = $1',
+    [userId]
+  );
+  return result.rowCount ?? 0;
+}
